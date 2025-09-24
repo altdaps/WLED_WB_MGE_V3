@@ -144,6 +144,18 @@ const ethernet_settings ethernetBoards[] = {
     18,			              // eth_mdio,
     ETH_PHY_LAN8720,      // eth_type,
     ETH_CLOCK_GPIO0_OUT	// eth_clk_mode
+    #if defined(ARDUINO_ARCH_ESP32) && defined(ESP_ARDUINO_VERSION_MAJOR) //ESP_IDF_VERSION_MAJOR==3
+  },
+
+  // WB_MGE_V3_RTL8201
+  {
+    0,			              // eth_address,
+    5,			              // eth_power,
+    23,			              // eth_mdc,
+    18,			              // eth_mdio,
+    ETH_PHY_RTL8201,      // eth_type,
+    ETH_CLOCK_GPIO0_IN	  // eth_clk_mode
+#endif    
   }
 };
 
