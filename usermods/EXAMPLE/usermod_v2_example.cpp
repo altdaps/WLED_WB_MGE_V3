@@ -1,4 +1,6 @@
 #include "wled.h"
+#include "TCA9555.h"
+TCA9555 TCA(0x20);
 
 /*
  * Usermods allow you to add own functionality to WLED more easily
@@ -23,6 +25,10 @@ class MyExampleUsermod : public Usermod {
 
   private:
 
+    int LedWifi = 4; //WIFI LED (Active LOW)
+    int LedEth = 5; //Ethernet LED (Active LOW)
+    int LedStatus = 7; //STATUS LED (Active HIGH)
+    int PinRts = 4; // DE RTS RS485 (Active HIGH)
     // Private class members. You can declare variables and functions only accessible to your usermod here
     bool enabled = false;
     bool initDone = false;
@@ -86,6 +92,13 @@ class MyExampleUsermod : public Usermod {
      * You can use it to initialize variables, sensors or similar.
      */
     void setup() override {
+      TCA.begin();
+      TCA.pinMode1(LedWifi, OUTPUT);
+      TCA.pinMode1(LedEth, OUTPUT);
+      TCA.pinMode1(LedStatus, OUTPUT);
+      
+      pinMode(PinRts, OUTPUT);
+      digitalWrite(PinRts, HIGH); 
       // do your set-up here
       //Serial.println("Hello from my usermod!");
       initDone = true;
@@ -112,6 +125,10 @@ class MyExampleUsermod : public Usermod {
      *    Instead, use a timer check as shown here.
      */
     void loop() override {
+
+      TCA.write1(LedWifi, !(WiFi.localIP()[0] != 0));
+      TCA.write1(LedEth, !(ETH.localIP()[0] != 0));
+      TCA.write1(LedStatus, ledStatusState);
       // if usermod is disabled or called during strip updating just exit
       // NOTE: on very long strips strip.isUpdating() may always return true so update accordingly
       if (!enabled || strip.isUpdating()) return;
